@@ -7,7 +7,7 @@ To complete the 30 day challenge #30DaysOfJSChallenge
 ## DayCheck
 
 - [✅] Day1
-- [ ] Day2
+- [✅] Day2
 - [ ] Day3
 - [ ] Day4
 - [ ] Day5
