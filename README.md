@@ -14,7 +14,7 @@ To complete the 30 day challenge #30DaysOfJSChallenge
 - [✅] Day6
 - [✅] Day7
 - [✅] Day8
-- [ ] Day9
+- [✅] Day9
 - [ ] Day10
 - [ ] Day11
 - [ ] Day12
