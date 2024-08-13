@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Social Media Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+      }
+      .container {
+        width: 60%;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .sidebar {
+        width: 25%;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-right: 20px;
+      }
+      .notifications {
+        margin-top: 20px;
+      }
+      .notifications h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+      .notification {
+        background: #e9f1ff;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      h1,
+      h2 {
+        text-align: center;
+      }
+      .login-form,
+      .register-form,
+      .post-form,
+      .profile-form,
+      .post-feed {
+        margin-bottom: 20px;
+      }
+      input[type="text"],
+      input[type="password"],
+      input[type="email"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      button {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .post {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+        background: #fafafa;
+      }
+      .post.mine {
+        border-color: #007bff;
+        background: #e9f1ff;
+      }
+      .post h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+        color: #333;
+      }
+      .post p {
+        margin: 10px 0;
+      }
+      .post img {
+        max-width: 100%;
+        border-radius: 5px;
+      }
+      .post .actions {
+        margin-top: 10px;
+      }
+      .post .actions button {
+        background: #28a745;
+        margin-right: 10px;
+      }
+      .post .actions button:hover {
+        background: #218838;
+      }
+      .comments {
+        margin-top: 10px;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+      }
+      .comments p {
+        margin: 5px 0;
+        font-size: 14px;
+      }
+      .like-count,
+      .comment-count {
+        font-size: 14px;
+        color: #555;
+      }
+      .profile-form {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2>User Information</h2>
+      <div id="userInfo">
+        <!-- User information will be displayed here -->
+      </div>
+      <button onclick="toggleProfileForm()">Edit Profile</button>
+      <div class="notifications">
+        <h3>Notifications</h3>
+        <div id="notifications"></div>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1>Social Media Dashboard</h1>
+
+      <!-- Registration Form -->
+      <div class="register-form" id="registerForm">
+        <h2>Register</h2>
+        <input type="text" id="regUsername" placeholder="Username" required />
+        <input type="email" id="regEmail" placeholder="Email" required />
+        <input
+          type="password"
+          id="regPassword"
+          placeholder="Password"
+          required
+        />
+        <button onclick="register()">Register</button>
+        <p>
+          Already have an account?
+          <a href="#" onclick="showLoginForm()">Login</a>
+        </p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="login-form" id="loginForm" style="display: none">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button onclick="login()">Login</button>
+        <p>
+          Don't have an account?
+          <a href="#" onclick="showRegisterForm()">Register</a>
+        </p>
+      </div>
+
+      <!-- Profile Form -->
+      <div class="profile-form" id="profileForm">
+        <h2>Edit Profile</h2>
+        <input
+          type="text"
+          id="profileUsername"
+          placeholder="Username"
+          required
+        />
+        <input type="email" id="profileEmail" placeholder="Email" required />
+        <input
+          type="text"
+          id="profilePicture"
+          placeholder="Profile Picture URL"
+        />
+        <button onclick="updateProfile()">Update Profile</button>
+      </div>
+
+      <!-- Post Form -->
+      <div class="post-form" id="postForm" style="display: none">
+        <h2>Create a Post</h2>
+        <textarea
+          id="postText"
+          placeholder="What's on your mind?"
+          required
+        ></textarea>
+        <input type="text" id="postImage" placeholder="Image URL (optional)" />
+        <button onclick="createPost()">Post</button>
+      </div>
+
+      <!-- Post Feed -->
+      <div class="post-feed" id="postFeed"></div>
+    </div>
+
+    <script>
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+      let posts = JSON.parse(localStorage.getItem("posts")) || [];
+      let notifications = [];
+      let loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+
+      function showRegisterForm() {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("registerForm").style.display = "block";
+      }
+
+      function showLoginForm() {
+        document.getElementById("registerForm").style.display = "none";
+        document.getElementById("loginForm").style.display = "block";
+      }
+
+      function register() {
+        const username = document.getElementById("regUsername").value;
+        const email = document.getElementById("regEmail").value;
+        const password = document.getElementById("regPassword").value;
+
+        if (username && email && password) {
+          const newUser = { username, email, password, profilePicture: "" };
+          users.push(newUser);
+          localStorage.setItem("users", JSON.stringify(users));
+          alert("Registration successful! Please login.");
+          showLoginForm();
+        } else {
+          alert("Please fill in all fields.");
+        }
+      }
+
+      function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const user = users.find(
+          (u) => u.username === username && u.password === password
+        );
+        if (user) {
+          loggedInUser = user;
+          sessionStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
+          document.getElementById("loginForm").style.display = "none";
+          document.getElementById("registerForm").style.display = "none";
+          document.getElementById("postForm").style.display = "block";
+          document.getElementById("profileForm").style.display = "none";
+          displayUserInfo();
+          displayPosts();
+        } else {
+          alert("Invalid username or password.");
+        }
+      }
+
+      function displayUserInfo() {
+        const userInfo = document.getElementById("userInfo");
+        userInfo.innerHTML = `
+                <p><strong>Username:</strong> ${loggedInUser.username}</p>
+                <p><strong>Email:</strong> ${loggedInUser.email}</p>
+                ${
+                  loggedInUser.profilePicture
+                    ? `<img src="${loggedInUser.profilePicture}" alt="Profile Picture" style="width: 100%; border-radius: 5px;">`
+                    : ""
+                }
+            `;
+      }
+
+      function toggleProfileForm() {
+        const profileForm = document.getElementById("profileForm");
+        const postForm = document.getElementById("postForm");
+        profileForm.style.display =
+          profileForm.style.display === "block" ? "none" : "block";
+        postForm.style.display =
+          postForm.style.display === "none" ? "block" : "none";
+
+        document.getElementById("profileUsername").value =
+          loggedInUser.username;
+        document.getElementById("profileEmail").value = loggedInUser.email;
+        document.getElementById("profilePicture").value =
+          loggedInUser.profilePicture || "";
+      }
+
+      function updateProfile() {
+        const username = document.getElementById("profileUsername").value;
+        const email = document.getElementById("profileEmail").value;
+        const profilePicture = document.getElementById("profilePicture").value;
+
+        if (username && email) {
+          loggedInUser.username = username;
+          loggedInUser.email = email;
+          loggedInUser.profilePicture = profilePicture;
+          sessionStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
+
+          const userIndex = users.findIndex(
+            (u) => u.username === loggedInUser.username
+          );
+          users[userIndex] = loggedInUser;
+          localStorage.setItem("users", JSON.stringify(users));
+
+          alert("Profile updated successfully!");
+          toggleProfileForm();
+          displayUserInfo();
+          displayPosts();
+        } else {
+          alert("Please fill in all fields.");
+        }
+      }
+
+      function createPost() {
+        const postText = document.getElementById("postText").value;
+        const postImage = document.getElementById("postImage").value;
+
+        if (postText) {
+          const newPost = {
+            username: loggedInUser.username,
+            text: postText,
+            image: postImage,
+            likes: 0,
+            comments: [],
+          };
+          posts.push(newPost);
+          localStorage.setItem("posts", JSON.stringify(posts));
+          displayPosts();
+          document.getElementById("postText").value = "";
+          document.getElementById("postImage").value = "";
+        } else {
+          alert("Please enter some text for the post.");
+        }
+      }
+
+      function displayPosts() {
+        const postFeed = document.getElementById("postFeed");
+        postFeed.innerHTML = "";
+
+        posts.forEach((post, index) => {
+          const postElement = document.createElement("div");
+          postElement.classList.add("post");
+          if (post.username === loggedInUser.username) {
+            postElement.classList.add("mine");
+          }
+          postElement.innerHTML = `
+                    <h3>${post.username}</h3>
+                    <p>${post.text}</p>
+                    ${
+                      post.image
+                        ? `<img src="${post.image}" alt="Post Image">`
+                        : ""
+                    }
+                    <div class="actions">
+                        <button onclick="likePost(${index})">Like</button>
+                        <button onclick="promptComment(${index})">Comment</button>
+                    </div>
+                    <p class="like-count">${post.likes} ${
+            post.likes === 1 ? "Like" : "Likes"
+          }</p>
+                    <div class="comments">${post.comments
+                      .map((comment) => `<p>${comment}</p>`)
+                      .join("")}</div>
+                `;
+          postFeed.appendChild(postElement);
+        });
+      }
+
+      function likePost(index) {
+        posts[index].likes++;
+        localStorage.setItem("posts", JSON.stringify(posts));
+        displayPosts();
+        addNotification(`${loggedInUser.username} liked your post!`);
+      }
+
+      function promptComment(index) {
+        const comment = prompt("Enter your comment:");
+        if (comment) {
+          posts[index].comments.push(`${loggedInUser.username}: ${comment}`);
+          localStorage.setItem("posts", JSON.stringify(posts));
+          displayPosts();
+          addNotification(`${loggedInUser.username} commented on your post!`);
+        }
+      }
+
+      function addNotification(message) {
+        notifications.push(message);
+        const notificationsElement = document.getElementById("notifications");
+        const notificationElement = document.createElement("div");
+        notificationElement.classList.add("notification");
+        notificationElement.innerText = message;
+        notificationsElement.appendChild(notificationElement);
+      }
+
+      if (loggedInUser) {
+        document.getElementById("registerForm").style.display = "none";
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("postForm").style.display = "block";
+        displayUserInfo();
+        displayPosts();
+      }
+    </script>
+  </body>
+</html>

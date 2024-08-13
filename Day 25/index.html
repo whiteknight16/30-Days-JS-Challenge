@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Search App</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="movie-search-container">
+      <h1>Movie Search App</h1>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Enter movie title" />
+        <button id="searchButton">Search</button>
+      </div>
+      <div id="movieResults">
+        <!-- Movie search results will be displayed here -->
+      </div>
+    </div>
+
+    <!-- Modal for detailed movie information -->
+    <div id="movieModal" class="modal">
+      <div class="modal-content">
+        <span id="closeModal">&times;</span>
+        <h2 id="movieTitle"></h2>
+        <img id="moviePoster" src="" alt="Movie Poster" />
+        <p id="moviePlot"></p>
+        <p><strong>Director:</strong> <span id="movieDirector"></span></p>
+        <p><strong>Actors:</strong> <span id="movieActors"></span></p>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
